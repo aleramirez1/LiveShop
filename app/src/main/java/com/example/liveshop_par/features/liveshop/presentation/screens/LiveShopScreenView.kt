@@ -44,10 +44,10 @@ import com.example.liveshop_par.features.liveshop.presentation.viewmodels.LiveSh
 
 @Composable
 fun LiveShopScreenView(
-    viewModel: LiveShopViewModelImpl = hiltViewModel(),
     onLogout: () -> Unit,
     userId: Int
 ) {
+    val viewModel: LiveShopViewModelImpl = hiltViewModel()
     val uiState by viewModel.uiState.collectAsState()
     var showAddProductDialog by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }

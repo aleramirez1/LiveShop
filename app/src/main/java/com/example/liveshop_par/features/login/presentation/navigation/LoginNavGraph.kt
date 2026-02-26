@@ -7,9 +7,6 @@ import com.example.liveshop_par.core.di.SessionManager
 import com.example.liveshop_par.core.navigation.Login
 import com.example.liveshop_par.core.navigation.Register
 import com.example.liveshop_par.features.login.presentation.screens.LoginScreenView
-import com.example.liveshop_par.features.login.presentation.viewmodels.LoginViewModelImpl
-import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 
 fun NavGraphBuilder.loginGraph(
     navController: NavHostController,

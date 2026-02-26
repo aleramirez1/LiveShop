@@ -32,7 +32,7 @@ object AppModule {
     @Singleton
     @Provides
     fun provideApiClient(): LiveShopApi {
-        return ApiClient.getInstance()
+        return ApiClient.apiService
     }
 
     @Singleton

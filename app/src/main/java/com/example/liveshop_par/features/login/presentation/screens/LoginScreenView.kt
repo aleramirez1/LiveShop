@@ -29,10 +29,10 @@ import com.example.liveshop_par.features.login.presentation.viewmodels.LoginView
 
 @Composable
 fun LoginScreenView(
-    viewModel: LoginViewModelImpl = hiltViewModel(),
     onLoginSuccess: (userId: Int, userName: String, userEmail: String) -> Unit,
     onNavigateToRegister: () -> Unit
 ) {
+    val viewModel: LoginViewModelImpl = hiltViewModel()
     val authState by viewModel.authState.collectAsState()
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }

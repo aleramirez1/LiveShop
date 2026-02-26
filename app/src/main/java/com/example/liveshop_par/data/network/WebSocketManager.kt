@@ -43,55 +43,34 @@ class WebSocketManager(
         }
     }
 
-    /**
-     * Desconectar del servidor WebSocket
-     */
     fun disconnect() {
         webSocket?.close(1000, "Desconexión normal")
         webSocket = null
     }
 
-    /**
-     * Suscribirse a actualizaciones de productos
-     */
     fun subscribeToProducts() {
         sendMessage("""{"type": "subscribe_products"}""")
     }
 
-    /**
-     * Suscribirse a datos de usuario
-     */
     fun subscribeToUser(userId: Int) {
         sendMessage("""{"type": "subscribe_user", "userId": $userId}""")
     }
 
-    /**
-     * Notificar que se creó un producto
-     */
     fun notifyProductCreated(product: ProductResponse) {
         val json = Json.encodeToString(ProductResponse.serializer(), product)
         sendMessage("""{"type": "product_created", "product": $json}""")
     }
 
-    /**
-     * Notificar que se actualizó un producto
-     */
     fun notifyProductUpdated(product: ProductResponse) {
         val json = Json.encodeToString(ProductResponse.serializer(), product)
         sendMessage("""{"type": "product_updated", "product": $json}""")
     }
 
-    /**
-     * Notificar que se eliminó un producto
-     */
     fun notifyProductDeleted(product: ProductResponse) {
         val json = Json.encodeToString(ProductResponse.serializer(), product)
         sendMessage("""{"type": "product_deleted", "product": $json}""")
     }
 
-    /**
-     * Enviar mensaje al servidor
-     */
     private fun sendMessage(message: String) {
         try {
             webSocket?.send(message)
@@ -101,8 +80,6 @@ class WebSocketManager(
             emitError("Error al enviar: ${e.message}")
         }
     }
-
-    // WebSocketListener callbacks
 
     override fun onOpen(webSocket: WebSocket, response: okhttp3.Response) {
         println("✓ WebSocket conectado")
@@ -188,8 +165,6 @@ class WebSocketManager(
         emitConnectionStatus(ConnectionStatus.ERROR)
     }
 
-    // Métodos privados para emitir eventos
-
     private suspend fun emitProductUpdate(update: ProductUpdate) {
         try {
             _productUpdates.emit(update)
@@ -213,8 +188,6 @@ class WebSocketManager(
             println("Error emitiendo error: ${e.message}")
         }
     }
-
-    // Tipos de datos
 
     sealed class ProductUpdate {
         data class ProductsList(val products: List<ProductResponse>) : ProductUpdate()

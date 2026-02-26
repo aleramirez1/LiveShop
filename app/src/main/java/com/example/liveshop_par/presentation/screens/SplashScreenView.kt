@@ -18,15 +18,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.example.liveshop_par.core.navigation.Routes
+import com.example.liveshop_par.core.navigation.Login
+import com.example.liveshop_par.core.navigation.Splash
 import kotlinx.coroutines.delay
 
 @Composable
 fun SplashScreenView(navController: NavHostController) {
     LaunchedEffect(Unit) {
         delay(2000)
-        navController.navigate(Routes.Login.route) {
-            popUpTo(Routes.Splash.route) { inclusive = true }
+        navController.navigate(Login) {
+            popUpTo(Splash) { inclusive = true }
         }
     }
 

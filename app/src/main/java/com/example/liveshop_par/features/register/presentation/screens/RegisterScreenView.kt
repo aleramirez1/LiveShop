@@ -29,10 +29,10 @@ import com.example.liveshop_par.features.register.presentation.viewmodels.Regist
 
 @Composable
 fun RegisterScreenView(
-    viewModel: RegisterViewModelImpl = hiltViewModel(),
     onRegisterSuccess: (userId: Int, userName: String, userEmail: String) -> Unit,
     onNavigateToLogin: () -> Unit
 ) {
+    val viewModel: RegisterViewModelImpl = hiltViewModel()
     val authState by viewModel.authState.collectAsState()
     var email by remember { mutableStateOf("") }
     var name by remember { mutableStateOf("") }
