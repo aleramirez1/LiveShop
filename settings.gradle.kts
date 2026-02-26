@@ -19,6 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Liveshop"
+rootProject.name = "LiveShop_par"
 include(":app")
- 
