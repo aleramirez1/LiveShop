@@ -26,7 +26,7 @@ object AppModule {
             context,
             AppDatabase::class.java,
             "liveshop_database"
-        ).build()
+        ).fallbackToDestructiveMigration().build()
     }
 
     @Singleton

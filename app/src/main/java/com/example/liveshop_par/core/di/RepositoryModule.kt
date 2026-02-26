@@ -37,9 +37,8 @@ object RepositoryModule {
     @Singleton
     @Provides
     fun provideProductRepository(
-        database: AppDatabase,
-        api: LiveShopApi
+        database: AppDatabase
     ): ProductRepository {
-        return ProductRepositoryImpl(database.productDao(), api)
+        return ProductRepositoryImpl(database.productDao())
     }
 }

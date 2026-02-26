@@ -4,6 +4,7 @@ import com.example.liveshop_par.features.liveshop.domain.repositories.ProductRep
 import com.example.liveshop_par.features.liveshop.domain.usecases.AddProductUseCase
 import com.example.liveshop_par.features.liveshop.domain.usecases.GetAllProductsUseCase
 import com.example.liveshop_par.features.liveshop.domain.usecases.SearchProductsUseCase
+import com.example.liveshop_par.features.liveshop.domain.usecases.PurchaseProductUseCase
 import com.example.liveshop_par.features.login.domain.repositories.AuthRepository
 import com.example.liveshop_par.features.login.domain.usecases.LoginUseCase
 import com.example.liveshop_par.features.register.domain.repositories.RegisterRepository
@@ -56,5 +57,13 @@ object UseCaseModule {
         productRepository: ProductRepository
     ): SearchProductsUseCase {
         return SearchProductsUseCase(productRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun providePurchaseProductUseCase(
+        productRepository: ProductRepository
+    ): PurchaseProductUseCase {
+        return PurchaseProductUseCase(productRepository)
     }
 }

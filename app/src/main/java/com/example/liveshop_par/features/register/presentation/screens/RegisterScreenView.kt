@@ -43,7 +43,7 @@ fun RegisterScreenView(
     LaunchedEffect(authState.isAuthenticated) {
         if (authState.isAuthenticated && authState.user != null) {
             val user = authState.user!!
-            onRegisterSuccess(user.id, user.name, user.email)
+            onNavigateToLogin()
         }
     }
 
@@ -122,14 +122,16 @@ fun RegisterScreenView(
 
         Button(
             onClick = {
-                if (password == confirmPassword) {
+                if (password == confirmPassword && email.isNotEmpty() && name.isNotEmpty() && phone.isNotEmpty() && password.isNotEmpty()) {
                     viewModel.register(email, name, password, phone)
+                } else if (password != confirmPassword) {
+                    
                 }
             },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp),
-            enabled = !authState.isLoading && email.isNotEmpty() && name.isNotEmpty() && password.isNotEmpty() && password == confirmPassword
+            enabled = !authState.isLoading && email.isNotEmpty() && name.isNotEmpty() && password.isNotEmpty() && phone.isNotEmpty() && password == confirmPassword
         ) {
             if (authState.isLoading) {
                 CircularProgressIndicator(modifier = Modifier.height(24.dp))

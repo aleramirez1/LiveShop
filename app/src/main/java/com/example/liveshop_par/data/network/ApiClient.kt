@@ -6,21 +6,20 @@ import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import java.util.concurrent.TimeUnit
 
 object ApiClient {
-    private const val BASE_URL = "https://liveshop.myddns.me/"
+    private const val BASE_URL = "http://10.0.2.2:8080/"
     
     private val json = Json {
         ignoreUnknownKeys = true
         coerceInputValues = true
     }
     
-    private val loggingInterceptor = HttpLoggingInterceptor().apply {
-        level = HttpLoggingInterceptor.Level.BODY
-    }
-    
     private val okHttpClient = OkHttpClient.Builder()
-        .addInterceptor(loggingInterceptor)
+        .connectTimeout(15, TimeUnit.SECONDS)
+        .readTimeout(15, TimeUnit.SECONDS)
+        .writeTimeout(15, TimeUnit.SECONDS)
         .build()
     
     private val retrofit = Retrofit.Builder()

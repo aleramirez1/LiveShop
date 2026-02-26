@@ -1,8 +1,11 @@
 package com.example.liveshop_par.data.network
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonArray
@@ -13,12 +16,13 @@ import okhttp3.WebSocketListener
 import okio.ByteString
 
 class WebSocketManager(
-    private val wsUrl: String = "ws://localhost:8080"
+    private val wsUrl: String = "ws://10.0.2.2:8080"
 ) : WebSocketListener() {
 
     private var webSocket: WebSocket? = null
     private val client = OkHttpClient()
     private val json = Json
+    private val scope = CoroutineScope(Dispatchers.Default)
 
     private val _productUpdates = MutableSharedFlow<ProductUpdate>()
     val productUpdates: SharedFlow<ProductUpdate> = _productUpdates.asSharedFlow()
@@ -165,27 +169,33 @@ class WebSocketManager(
         emitConnectionStatus(ConnectionStatus.ERROR)
     }
 
-    private suspend fun emitProductUpdate(update: ProductUpdate) {
-        try {
-            _productUpdates.emit(update)
-        } catch (e: Exception) {
-            println("Error emitiendo actualización: ${e.message}")
+    private fun emitProductUpdate(update: ProductUpdate) {
+        scope.launch {
+            try {
+                _productUpdates.emit(update)
+            } catch (e: Exception) {
+                println("Error emitiendo actualización: ${e.message}")
+            }
         }
     }
 
-    private suspend fun emitConnectionStatus(status: ConnectionStatus) {
-        try {
-            _connectionStatus.emit(status)
-        } catch (e: Exception) {
-            println("Error emitiendo estado: ${e.message}")
+    private fun emitConnectionStatus(status: ConnectionStatus) {
+        scope.launch {
+            try {
+                _connectionStatus.emit(status)
+            } catch (e: Exception) {
+                println("Error emitiendo estado: ${e.message}")
+            }
         }
     }
 
-    private suspend fun emitError(message: String) {
-        try {
-            _errors.emit(message)
-        } catch (e: Exception) {
-            println("Error emitiendo error: ${e.message}")
+    private fun emitError(message: String) {
+        scope.launch {
+            try {
+                _errors.emit(message)
+            } catch (e: Exception) {
+                println("Error emitiendo error: ${e.message}")
+            }
         }
     }
 

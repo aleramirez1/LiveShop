@@ -10,4 +10,5 @@ interface ProductRepository {
     fun searchProducts(query: String): Flow<List<Product>>
     fun getProductsByCategory(category: String): Flow<List<Product>>
     suspend fun updateProduct(product: Product): Result<Unit>
+    suspend fun purchaseProduct(buyerId: Int, productId: Int, quantity: Int): Result<Unit>
 }

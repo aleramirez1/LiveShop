@@ -9,6 +9,7 @@ data class Product(
     val imageUri: String,
     val availableUnits: Int,
     val sellerId: Int,
+    val sellerName: String = "",
     val sellerPhone: String = "",
     val createdAt: Long = System.currentTimeMillis()
 )
