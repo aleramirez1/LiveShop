@@ -4,7 +4,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.example.liveshop_par.core.di.SessionManager
-import com.example.liveshop_par.core.navigation.LiveShop
+import com.example.liveshop_par.core.navigation.Login
 import com.example.liveshop_par.core.navigation.Register
 import com.example.liveshop_par.features.register.presentation.screens.RegisterScreenView
 
@@ -14,9 +14,8 @@ fun NavGraphBuilder.registerGraph(
 ) {
     composable<Register> {
         RegisterScreenView(
-            onRegisterSuccess = { userId, userName, userEmail ->
-                sessionManager.setSession(userId, userName, userEmail)
-                navController.navigate(LiveShop) {
+            onRegisterSuccess = {
+                navController.navigate(Login) {
                     popUpTo(Register) { inclusive = true }
                 }
             },

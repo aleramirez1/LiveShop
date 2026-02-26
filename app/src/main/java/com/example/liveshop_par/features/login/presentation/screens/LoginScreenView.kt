@@ -38,9 +38,8 @@ fun LoginScreenView(
     var password by remember { mutableStateOf("") }
 
     LaunchedEffect(authState.isAuthenticated) {
-        if (authState.isAuthenticated && authState.user != null) {
-            val user = authState.user!!
-            onLoginSuccess(user.id, user.name, user.email)
+        if (authState.isAuthenticated && authState.userId != null) {
+            onLoginSuccess(authState.userId!!, authState.userName ?: "", authState.userEmail ?: "")
         }
     }
 

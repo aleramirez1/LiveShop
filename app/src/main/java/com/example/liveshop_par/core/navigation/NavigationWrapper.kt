@@ -7,7 +7,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.liveshop_par.core.di.SessionManager
-import com.example.liveshop_par.features.liveshop.presentation.navigation.liveShopGraph
 import com.example.liveshop_par.features.login.presentation.navigation.loginGraph
 import com.example.liveshop_par.features.register.presentation.navigation.registerGraph
 import com.example.liveshop_par.presentation.screens.SplashScreenView
@@ -34,6 +33,5 @@ fun NavigationWrapper() {
         }
         loginGraph(navController, sessionManager)
         registerGraph(navController, sessionManager)
-        liveShopGraph(navController, sessionManager)
     }
 }

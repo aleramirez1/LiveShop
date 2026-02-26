@@ -16,9 +16,6 @@ fun NavGraphBuilder.loginGraph(
         LoginScreenView(
             onLoginSuccess = { userId, userName, userEmail ->
                 sessionManager.setSession(userId, userName, userEmail)
-                navController.navigate(com.example.liveshop_par.core.navigation.LiveShop) {
-                    popUpTo(Login) { inclusive = true }
-                }
             },
             onNavigateToRegister = {
                 navController.navigate(Register)
