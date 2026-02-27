@@ -34,10 +34,9 @@ fun RegisterScreenView(
 ) {
     val viewModel: RegisterViewModelImpl = hiltViewModel()
     val authState by viewModel.authState.collectAsState()
-    var email by remember { mutableStateOf("") }
     var nombre by remember { mutableStateOf("") }
+    var numero by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var confirmPassword by remember { mutableStateOf("") }
 
     LaunchedEffect(authState.isAuthenticated) {
         if (authState.isAuthenticated) {
@@ -69,9 +68,9 @@ fun RegisterScreenView(
         )
 
         OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
-            label = { Text("Email") },
+            value = numero,
+            onValueChange = { numero = it },
+            label = { Text("Número") },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp),
@@ -89,17 +88,6 @@ fun RegisterScreenView(
             enabled = !authState.isLoading
         )
 
-        OutlinedTextField(
-            value = confirmPassword,
-            onValueChange = { confirmPassword = it },
-            label = { Text("Confirmar Contraseña") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp),
-            visualTransformation = PasswordVisualTransformation(),
-            enabled = !authState.isLoading
-        )
-
         if (authState.error != null) {
             Text(
                 text = authState.error ?: "",
@@ -110,12 +98,12 @@ fun RegisterScreenView(
 
         Button(
             onClick = {
-                viewModel.register(nombre, email, password)
+                viewModel.register(nombre, numero, password)
             },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp),
-            enabled = !authState.isLoading && email.isNotEmpty() && nombre.isNotEmpty() && password.isNotEmpty() && password == confirmPassword
+            enabled = !authState.isLoading && numero.isNotEmpty() && nombre.isNotEmpty() && password.isNotEmpty()
         ) {
             if (authState.isLoading) {
                 CircularProgressIndicator(modifier = Modifier.height(24.dp))

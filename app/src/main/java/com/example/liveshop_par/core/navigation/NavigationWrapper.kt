@@ -1,27 +1,16 @@
 package com.example.liveshop_par.core.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.ViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.liveshop_par.core.di.SessionManager
 import com.example.liveshop_par.features.login.presentation.navigation.loginGraph
 import com.example.liveshop_par.features.register.presentation.navigation.registerGraph
+import com.example.liveshop_par.features.marketplace.presentation.navigation.marketplaceGraph
 import com.example.liveshop_par.presentation.screens.SplashScreenView
-import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
-
-@HiltViewModel
-class SessionManagerViewModel @Inject constructor(
-    val sessionManager: SessionManager
-) : ViewModel()
 
 @Composable
 fun NavigationWrapper() {
-    val sessionManagerViewModel: SessionManagerViewModel = hiltViewModel()
-    val sessionManager = sessionManagerViewModel.sessionManager
     val navController = rememberNavController()
     
     NavHost(
@@ -31,7 +20,8 @@ fun NavigationWrapper() {
         composable<Splash> {
             SplashScreenView(navController)
         }
-        loginGraph(navController, sessionManager)
-        registerGraph(navController, sessionManager)
+        loginGraph(navController)
+        registerGraph(navController)
+        marketplaceGraph(navController)
     }
 }

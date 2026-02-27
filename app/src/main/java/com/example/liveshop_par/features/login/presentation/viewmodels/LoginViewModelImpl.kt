@@ -3,8 +3,7 @@ package com.example.liveshop_par.features.login.presentation.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.liveshop_par.core.di.SessionManager
-import com.example.liveshop_par.data.network.ApiClient
-import com.example.liveshop_par.data.network.LoginRequest
+import com.example.liveshop_par.domain.usecase.LoginUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,47 +14,50 @@ data class AuthState(
     val isAuthenticated: Boolean = false,
     val userId: Int? = null,
     val userName: String? = null,
-    val userEmail: String? = null,
+    val userNumber: String? = null,
     val token: String? = null,
     val isLoading: Boolean = false,
     val error: String? = null
 )
 
+// regla2: viewmodel inyectado con hilt, usa casos de uso de dominio
 @HiltViewModel
 class LoginViewModelImpl @Inject constructor(
-    private val sessionManager: SessionManager
+    private val sessionManager: SessionManager,
+    private val loginUseCase: LoginUseCase
 ) : ViewModel() {
 
     private val _authState = MutableStateFlow(AuthState())
     val authState: StateFlow<AuthState> = _authState
 
-    fun login(email: String, password: String) {
+    fun login(numero: String, password: String) {
         viewModelScope.launch {
             _authState.value = _authState.value.copy(isLoading = true, error = null)
-            try {
-                val response = ApiClient.apiService.login(LoginRequest(email, password))
-                if (response.token != null && response.id != null) {
-                    sessionManager.saveToken(response.token)
-                    sessionManager.saveUserId(response.id)
+            loginUseCase(numero, password).collect { result ->
+                result.onSuccess { user ->
+                    sessionManager.setSession(
+                        userId = user.id,
+                        userName = user.name,
+                        userNumber = user.number,
+                        userPassword = password
+                    )
+                    sessionManager.saveToken(user.token)
+                    
                     _authState.value = AuthState(
                         isAuthenticated = true,
-                        userId = response.id,
-                        userName = response.nombre ?: "",
-                        userEmail = response.email ?: "",
-                        token = response.token,
+                        userId = user.id,
+                        userName = user.name,
+                        userNumber = user.number,
+                        token = user.token,
                         isLoading = false
                     )
-                } else {
+                }
+                result.onFailure { exception ->
                     _authState.value = _authState.value.copy(
                         isLoading = false,
-                        error = "Credenciales inválidas"
+                        error = exception.message ?: "Error de conexion"
                     )
                 }
-            } catch (e: Exception) {
-                _authState.value = _authState.value.copy(
-                    isLoading = false,
-                    error = e.message ?: "Error de conexión"
-                )
             }
         }
     }

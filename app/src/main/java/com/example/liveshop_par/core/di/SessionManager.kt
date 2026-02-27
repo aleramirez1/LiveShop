@@ -11,19 +11,38 @@ class SessionManager {
     private val _userName = MutableStateFlow<String?>(null)
     val userName: StateFlow<String?> = _userName.asStateFlow()
     
-    private val _userEmail = MutableStateFlow<String?>(null)
-    val userEmail: StateFlow<String?> = _userEmail.asStateFlow()
+    private val _userNumber = MutableStateFlow<String?>(null)
+    val userNumber: StateFlow<String?> = _userNumber.asStateFlow()
     
-    fun setSession(userId: Int, userName: String, userEmail: String) {
+    private val _userPassword = MutableStateFlow<String?>(null)
+    val userPassword: StateFlow<String?> = _userPassword.asStateFlow()
+    
+    private val _token = MutableStateFlow<String?>(null)
+    val token: StateFlow<String?> = _token.asStateFlow()
+    
+    fun setSession(userId: Int, userName: String, userNumber: String, userPassword: String = "") {
         _userId.value = userId
         _userName.value = userName
-        _userEmail.value = userEmail
+        _userNumber.value = userNumber
+        _userPassword.value = userPassword
+    }
+    
+    fun saveToken(token: String) {
+        _token.value = token
+    }
+    
+    fun getToken(): String? = _token.value
+    
+    fun saveUserId(userId: Int) {
+        _userId.value = userId
     }
     
     fun clearSession() {
         _userId.value = null
         _userName.value = null
-        _userEmail.value = null
+        _userNumber.value = null
+        _userPassword.value = null
+        _token.value = null
     }
     
     fun isLoggedIn(): Boolean = _userId.value != null
