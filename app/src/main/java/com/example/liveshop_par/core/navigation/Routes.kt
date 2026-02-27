@@ -12,4 +12,4 @@ object Login
 object Register
 
 @Serializable
-object LiveShop
+object Marketplace

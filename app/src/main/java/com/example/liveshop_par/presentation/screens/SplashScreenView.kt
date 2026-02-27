@@ -12,22 +12,44 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.ViewModel
 import androidx.navigation.NavHostController
+import com.example.liveshop_par.core.di.SessionManager
 import com.example.liveshop_par.core.navigation.Login
+import com.example.liveshop_par.core.navigation.Marketplace
 import com.example.liveshop_par.core.navigation.Splash
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
+import javax.inject.Inject
+
+@HiltViewModel
+class SplashViewModel @Inject constructor(
+    val sessionManager: SessionManager
+) : ViewModel()
 
 @Composable
 fun SplashScreenView(navController: NavHostController) {
+    val viewModel: SplashViewModel = hiltViewModel()
+    val userId by viewModel.sessionManager.userId.collectAsState()
+    
     LaunchedEffect(Unit) {
-        delay(2000)
-        navController.navigate(Login) {
-            popUpTo(Splash) { inclusive = true }
+        delay(1000)
+        if (userId != null) {
+            navController.navigate(Marketplace) {
+                popUpTo(Splash) { inclusive = true }
+            }
+        } else {
+            navController.navigate(Login) {
+                popUpTo(Splash) { inclusive = true }
+            }
         }
     }
 
@@ -57,3 +79,4 @@ fun SplashScreenView(navController: NavHostController) {
         }
     }
 }
+

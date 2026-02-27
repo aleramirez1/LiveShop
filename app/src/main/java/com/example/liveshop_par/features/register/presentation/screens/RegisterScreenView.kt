@@ -29,21 +29,18 @@ import com.example.liveshop_par.features.register.presentation.viewmodels.Regist
 
 @Composable
 fun RegisterScreenView(
-    onRegisterSuccess: (userId: Int, userName: String, userEmail: String) -> Unit,
+    onRegisterSuccess: () -> Unit,
     onNavigateToLogin: () -> Unit
 ) {
     val viewModel: RegisterViewModelImpl = hiltViewModel()
     val authState by viewModel.authState.collectAsState()
-    var email by remember { mutableStateOf("") }
-    var name by remember { mutableStateOf("") }
-    var phone by remember { mutableStateOf("") }
+    var nombre by remember { mutableStateOf("") }
+    var numero by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var confirmPassword by remember { mutableStateOf("") }
 
     LaunchedEffect(authState.isAuthenticated) {
-        if (authState.isAuthenticated && authState.user != null) {
-            val user = authState.user!!
-            onRegisterSuccess(user.id, user.name, user.email)
+        if (authState.isAuthenticated) {
+            onRegisterSuccess()
         }
     }
 
@@ -61,8 +58,8 @@ fun RegisterScreenView(
         )
 
         OutlinedTextField(
-            value = name,
-            onValueChange = { name = it },
+            value = nombre,
+            onValueChange = { nombre = it },
             label = { Text("Nombre") },
             modifier = Modifier
                 .fillMaxWidth()
@@ -71,19 +68,9 @@ fun RegisterScreenView(
         )
 
         OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
-            label = { Text("Email") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp),
-            enabled = !authState.isLoading
-        )
-
-        OutlinedTextField(
-            value = phone,
-            onValueChange = { phone = it.filter { c -> c.isDigit() } },
-            label = { Text("Teléfono") },
+            value = numero,
+            onValueChange = { numero = it },
+            label = { Text("Número") },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp),
@@ -101,17 +88,6 @@ fun RegisterScreenView(
             enabled = !authState.isLoading
         )
 
-        OutlinedTextField(
-            value = confirmPassword,
-            onValueChange = { confirmPassword = it },
-            label = { Text("Confirmar Contraseña") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp),
-            visualTransformation = PasswordVisualTransformation(),
-            enabled = !authState.isLoading
-        )
-
         if (authState.error != null) {
             Text(
                 text = authState.error ?: "",
@@ -122,14 +98,12 @@ fun RegisterScreenView(
 
         Button(
             onClick = {
-                if (password == confirmPassword) {
-                    viewModel.register(email, name, password, phone)
-                }
+                viewModel.register(nombre, numero, password)
             },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp),
-            enabled = !authState.isLoading && email.isNotEmpty() && name.isNotEmpty() && password.isNotEmpty() && password == confirmPassword
+            enabled = !authState.isLoading && numero.isNotEmpty() && nombre.isNotEmpty() && password.isNotEmpty()
         ) {
             if (authState.isLoading) {
                 CircularProgressIndicator(modifier = Modifier.height(24.dp))

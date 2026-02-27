@@ -29,18 +29,17 @@ import com.example.liveshop_par.features.login.presentation.viewmodels.LoginView
 
 @Composable
 fun LoginScreenView(
-    onLoginSuccess: (userId: Int, userName: String, userEmail: String) -> Unit,
+    onLoginSuccess: () -> Unit,
     onNavigateToRegister: () -> Unit
 ) {
     val viewModel: LoginViewModelImpl = hiltViewModel()
     val authState by viewModel.authState.collectAsState()
-    var email by remember { mutableStateOf("") }
+    var numero by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
     LaunchedEffect(authState.isAuthenticated) {
-        if (authState.isAuthenticated && authState.user != null) {
-            val user = authState.user!!
-            onLoginSuccess(user.id, user.name, user.email)
+        if (authState.isAuthenticated) {
+            onLoginSuccess()
         }
     }
 
@@ -58,9 +57,9 @@ fun LoginScreenView(
         )
 
         OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
-            label = { Text("Email") },
+            value = numero,
+            onValueChange = { numero = it },
+            label = { Text("Número") },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp),
@@ -87,11 +86,13 @@ fun LoginScreenView(
         }
 
         Button(
-            onClick = { viewModel.login(email, password) },
+            onClick = {
+                viewModel.login(numero, password)
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp),
-            enabled = !authState.isLoading && email.isNotEmpty() && password.isNotEmpty()
+            enabled = !authState.isLoading && numero.isNotEmpty() && password.isNotEmpty()
         ) {
             if (authState.isLoading) {
                 CircularProgressIndicator(modifier = Modifier.height(24.dp))
