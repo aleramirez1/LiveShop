@@ -69,6 +69,26 @@ class MarketplaceViewModelImpl @Inject constructor(
                 val numeroVendedor = sessionManager.userNumber.value ?: ""
                 val userId = sessionManager.userId.value ?: 0
                 
+                val newProduct = Product(
+                    id = System.currentTimeMillis().toInt(),
+                    nombre = nombre,
+                    precio = precio,
+                    stock = cantidad,
+                    imagen = imagenUri,
+                    nombreVendedor = nombreVendedor,
+                    numeroVendedor = numeroVendedor,
+                    idVendedor = userId,
+                    descripcion = descripcion,
+                    categoria = categoria
+                )
+                
+                val updatedProducts = _marketplaceState.value.products + newProduct
+                _marketplaceState.value = _marketplaceState.value.copy(
+                    isLoading = false,
+                    success = true,
+                    products = updatedProducts
+                )
+                
                 val product = Product(
                     id = 0,
                     nombre = nombre,
@@ -84,25 +104,6 @@ class MarketplaceViewModelImpl @Inject constructor(
                 
                 createProductUseCase(product).collect { result ->
                     result.onSuccess { createdProduct ->
-                        val newProduct = Product(
-                            id = System.currentTimeMillis().toInt(),
-                            nombre = nombre,
-                            precio = precio,
-                            stock = cantidad,
-                            imagen = imagenUri,
-                            nombreVendedor = nombreVendedor,
-                            numeroVendedor = numeroVendedor,
-                            idVendedor = userId,
-                            descripcion = descripcion,
-                            categoria = categoria
-                        )
-                        
-                        val updatedProducts = _marketplaceState.value.products + newProduct
-                        _marketplaceState.value = _marketplaceState.value.copy(
-                            isLoading = false,
-                            success = true,
-                            products = updatedProducts
-                        )
                     }
                     result.onFailure { exception ->
                         _marketplaceState.value = _marketplaceState.value.copy(
