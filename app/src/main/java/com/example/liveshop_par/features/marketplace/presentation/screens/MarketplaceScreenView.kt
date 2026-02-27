@@ -78,9 +78,9 @@ fun MarketplaceScreenView(
     if (showAddProduct) {
         AddProductModalView(
             onDismiss = { showAddProduct = false },
-            onAddProduct = { nombre, precio, cantidad, descripcion, categoria, imagenUri ->
+            onAddProduct = { nombre, precio, cantidad, descripcion, imagenUri ->
                 showAddProduct = false
-                viewModel.createProduct(nombre, precio, cantidad, descripcion, categoria, imagenUri, context)
+                viewModel.createProduct(nombre, precio, cantidad, descripcion, imagenUri, context)
             }
         )
     }

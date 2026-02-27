@@ -58,7 +58,6 @@ class MarketplaceViewModelImpl @Inject constructor(
         precio: Double,
         cantidad: Int,
         descripcion: String,
-        categoria: String,
         imagenUri: Uri?,
         context: Context? = null
     ) {
@@ -79,7 +78,6 @@ class MarketplaceViewModelImpl @Inject constructor(
                     numeroVendedor = numeroVendedor,
                     idVendedor = userId,
                     descripcion = descripcion,
-                    categoria = categoria
                 )
                 
                 createProductUseCase(product).collect { result ->
@@ -94,7 +92,6 @@ class MarketplaceViewModelImpl @Inject constructor(
                             numeroVendedor = numeroVendedor,
                             idVendedor = userId,
                             descripcion = descripcion,
-                            categoria = categoria
                         )
                         
                         val updatedProducts = _marketplaceState.value.products + newProduct

@@ -44,7 +44,7 @@ import coil.compose.AsyncImage
 @Composable
 fun AddProductModalView(
     onDismiss: () -> Unit,
-    onAddProduct: (nombre: String, precio: Double, cantidad: Int, descripcion: String, categoria: String, imagenUri: Uri?) -> Unit
+    onAddProduct: (nombre: String, precio: Double, cantidad: Int, descripcion: String, imagenUri: Uri?) -> Unit
 ) {
     var step by remember { mutableStateOf(1) }
     var nombre by remember { mutableStateOf("") }
@@ -52,7 +52,6 @@ fun AddProductModalView(
     var precio by remember { mutableStateOf("") }
     var cantidad by remember { mutableStateOf("") }
     var descripcion by remember { mutableStateOf("") }
-    var categoria by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
     
     val galleryLauncher = rememberLauncherForActivityResult(
@@ -188,14 +187,7 @@ fun AddProductModalView(
                             modifier = Modifier.fillMaxWidth(),
                             minLines = 3
                         )
-                        
-                        OutlinedTextField(
-                            value = categoria,
-                            onValueChange = { categoria = it },
-                            label = { Text("Categoría") },
-                            modifier = Modifier.fillMaxWidth(),
-                            singleLine = true
-                        )
+
                     }
                     
                     Row(
@@ -227,7 +219,6 @@ fun AddProductModalView(
                                             precio.toDoubleOrNull() ?: 0.0,
                                             cantidad.toIntOrNull() ?: 0,
                                             descripcion,
-                                            categoria,
                                             imagenUri
                                         )
                                     } catch (e: Exception) {
@@ -242,7 +233,7 @@ fun AddProductModalView(
                                 nombre.isNotEmpty() && imagenUri != null && !isLoading
                             } else {
                                 precio.isNotEmpty() && cantidad.isNotEmpty() && 
-                                descripcion.isNotEmpty() && categoria.isNotEmpty() && !isLoading
+                                descripcion.isNotEmpty() && !isLoading
                             }
                         ) {
                             if (isLoading) {

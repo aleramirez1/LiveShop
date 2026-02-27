@@ -1,5 +1,6 @@
 package com.example.liveshop_par.data.repository
 
+import com.example.liveshop_par.core.di.SessionManager
 import com.example.liveshop_par.data.network.LiveShopApi
 import com.example.liveshop_par.data.network.LoginRequest
 import com.example.liveshop_par.data.network.CreateUserRequest
@@ -11,22 +12,27 @@ import javax.inject.Inject
 
 // regla1: implementacion de repositorio en capa de datos, inyectada con hilt
 class AuthRepositoryImpl @Inject constructor(
-    private val apiService: LiveShopApi
+    private val apiService: LiveShopApi,
+    private val sessionManager: SessionManager
 ) : AuthRepository {
-    
+
     override fun login(number: String, password: String): Flow<Result<User>> = flow {
         try {
             val response = apiService.login(LoginRequest(number, password))
             if (response.isSuccessful) {
                 val body = response.body()
-                val token = response.headers()["Authorization"] ?: ""
-                
-                if (token.isNotEmpty() && body != null) {
+                val rawToken = response.headers()["Authorization"] ?: ""
+
+                if (rawToken.isNotEmpty() && body != null) {
+                    val cleanToken = rawToken.removePrefix("Bearer ").trim()
+
+                    sessionManager.saveToken(cleanToken)
+
                     val user = User(
                         id = body.id ?: 0,
                         name = body.nombre ?: "",
                         number = number,
-                        token = token
+                        token = cleanToken
                     )
                     emit(Result.success(user))
                 } else {

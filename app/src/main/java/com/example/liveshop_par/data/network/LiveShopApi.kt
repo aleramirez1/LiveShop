@@ -1,5 +1,6 @@
 package com.example.liveshop_par.data.network
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import retrofit2.Response
 import retrofit2.http.*
@@ -34,9 +35,13 @@ data class UserResponse(
 
 @Serializable
 data class CreateProductRequest(
+    @SerialName("name")
     val nombre: String,
+    @SerialName("price")
     val precio: Double,
+    @SerialName("stock")
     val stock: Int,
+    @SerialName("img_url")
     val imagen: String = "",
     val nombre_vendedor: String = "",
     val numero_vendedor: String = ""
@@ -47,16 +52,23 @@ data class ProductResponse(
     val message: String? = null,
     val product: ProductData? = null
 )
-
 @Serializable
 data class ProductData(
+    @SerialName("id_product")
     val id: Int? = null,
+
+    @SerialName("name")
     val nombre: String? = null,
+
+    @SerialName("price")
     val precio: Double? = null,
+    @SerialName("stock")
     val stock: Int? = null,
+    @SerialName("img_url")
     val imagen: String? = null,
     val nombre_vendedor: String? = null,
     val numero_vendedor: String? = null,
+    @SerialName("seller_id")
     val id_vendedor: Int? = null
 )
 
