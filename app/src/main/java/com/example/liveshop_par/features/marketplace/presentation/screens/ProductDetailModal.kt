@@ -1,7 +1,5 @@
 package com.example.liveshop_par.features.marketplace.presentation.screens
 
-import android.content.Intent
-import android.net.Uri
 import android.util.Base64
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -18,6 +16,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -28,7 +27,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -37,9 +35,12 @@ import coil.compose.AsyncImage
 import com.example.liveshop_par.domain.model.Product
 
 @Composable
-fun ProductDetailModal(product: Product, onDismiss: () -> Unit) {
-    val context = LocalContext.current
-
+fun ProductDetailModal(
+    product: Product,
+    onDismiss: () -> Unit,
+    onBuyClick: (Product) -> Unit = {},
+    isLoading: Boolean = false
+) {
     val imageModel = remember(product.imagen) {
         val uriString = product.imagen?.toString() ?: ""
         if (uriString.contains("base64,")) {
@@ -104,7 +105,7 @@ fun ProductDetailModal(product: Product, onDismiss: () -> Unit) {
                                 .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(8.dp))
                         ) {
                             AsyncImage(
-                                model = imageModel, // Pasamos el modelo decodificado
+                                model = imageModel,
                                 contentDescription = product.nombre,
                                 modifier = Modifier.fillMaxSize(),
                                 contentScale = ContentScale.Crop
@@ -119,7 +120,7 @@ fun ProductDetailModal(product: Product, onDismiss: () -> Unit) {
                     )
 
                     Text(
-                        text = "$${String.format("%.2f", product.precio)}",
+                        text = "${String.format("%.2f", product.precio)}",
                         style = MaterialTheme.typography.headlineSmall,
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Bold
@@ -143,18 +144,23 @@ fun ProductDetailModal(product: Product, onDismiss: () -> Unit) {
 
                     Button(
                         onClick = {
-                            val intent = Intent(Intent.ACTION_SENDTO).apply {
-                                data = Uri.parse("smsto:${product.numeroVendedor}")
-                                putExtra("sms_body", "Hola, me interesa tu producto: ${product.nombre}")
-                            }
-                            context.startActivity(intent)
+                            onBuyClick(product)
                         },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(56.dp)
-                            .padding(top = 16.dp, bottom = 16.dp)
+                            .padding(top = 16.dp, bottom = 16.dp),
+                        enabled = !isLoading
                     ) {
-                        Text("Contactar al vendedor")
+                        if (isLoading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier
+                                    .height(24.dp)
+                                    .padding(end = 8.dp),
+                                strokeWidth = 2.dp
+                            )
+                        }
+                        Text(if (isLoading) "Enviando..." else "Comprar")
                     }
                 }
             }

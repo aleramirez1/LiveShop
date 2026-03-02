@@ -13,6 +13,8 @@
 .externalNativeBuild
 .cxx
 local.properties
+/.kiro/
+/api/
 /websocket/
 /api/
 /.kiro/
