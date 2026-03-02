@@ -110,6 +110,16 @@ data class ProductData(
     val id_vendedor: Int? = null
 )
 
+@Serializable
+data class WsNotification(
+    @SerialName("type") val type: String? = null,
+    @SerialName("message") val message: String? = null,
+    @SerialName("buyer_name") val buyerName: String? = null,
+    @SerialName("buyer_number") val buyerNumber: String? = null,
+    @SerialName("product_name") val productName: String? = null,
+    @SerialName("quantity") val quantity: Int? = null
+)
+
 interface LiveShopApi {
     @POST("auth/login")
     suspend fun login(@Body request: LoginRequest): Response<LoginResponse>

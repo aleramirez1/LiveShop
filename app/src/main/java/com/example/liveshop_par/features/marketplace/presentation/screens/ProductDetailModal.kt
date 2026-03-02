@@ -1,7 +1,6 @@
 package com.example.liveshop_par.features.marketplace.presentation.screens
 
-import android.content.Intent
-import android.net.Uri
+
 import android.util.Base64
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

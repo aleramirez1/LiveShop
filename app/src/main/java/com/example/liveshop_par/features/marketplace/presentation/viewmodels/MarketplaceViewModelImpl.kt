@@ -5,16 +5,21 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.liveshop_par.core.di.SessionManager
+import com.example.liveshop_par.data.network.WsNotification
 import com.example.liveshop_par.domain.model.Order
 import com.example.liveshop_par.domain.model.Product
 import com.example.liveshop_par.domain.usecase.CreateOrderUseCase
 import com.example.liveshop_par.domain.usecase.GetAllProductsUseCase
 import com.example.liveshop_par.domain.usecase.CreateProductUseCase
 import com.example.liveshop_par.domain.usecase.GetAllProductByUserUseCase
+import com.example.liveshop_par.domain.usecase.ObserveNotificationsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 import javax.inject.Inject
 
 
@@ -32,7 +37,8 @@ class MarketplaceViewModelImpl @Inject constructor(
     private val getAllProductsUseCase: GetAllProductsUseCase,
     private val getAllProductsByUserUseCase: GetAllProductByUserUseCase,
     private val createProductUseCase: CreateProductUseCase,
-    private val createOrderUseCase: CreateOrderUseCase
+    private val createOrderUseCase: CreateOrderUseCase,
+    private val observeNotificationsUseCase: ObserveNotificationsUseCase
 ) : ViewModel() {
 
     private val _marketplaceState = MutableStateFlow(MarketplaceState())
@@ -187,5 +193,27 @@ class MarketplaceViewModelImpl @Inject constructor(
 
     fun resetSuccess() {
         _marketplaceState.value = _marketplaceState.value.copy(success = false)
+    }
+
+    private val _notificationEvent = MutableSharedFlow<WsNotification>()
+    val notificationEvent = _notificationEvent.asSharedFlow()
+
+    fun connectToWebSocket() {
+        val token = sessionManager.token.value ?: return
+
+        viewModelScope.launch {
+            observeNotificationsUseCase(token).collect { jsonString ->
+                try {
+
+                    val jsonParser = Json { ignoreUnknownKeys = true }
+                    val notification = jsonParser.decodeFromString<WsNotification>(jsonString)
+
+                    // 3. Emitimos el evento hacia la pantalla
+                    _notificationEvent.emit(notification)
+                } catch (e: Exception) {
+                    println("Error leyendo WS: ${e.message}")
+                }
+            }
+        }
     }
 }
