@@ -1,5 +1,6 @@
 package com.example.liveshop_par.data.network
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import retrofit2.Response
 import retrofit2.http.*
@@ -34,9 +35,15 @@ data class UserResponse(
 
 @Serializable
 data class CreateProductRequest(
+    @SerialName("name")
     val nombre: String,
+    @SerialName("price")
     val precio: Double,
+    @SerialName("stock")
     val stock: Int,
+    @SerialName("description")
+    val descripcion: String,
+    @SerialName("img_url")
     val imagen: String = "",
     val nombre_vendedor: String = "",
     val numero_vendedor: String = ""
@@ -47,36 +54,26 @@ data class ProductResponse(
     val message: String? = null,
     val product: ProductData? = null
 )
-
 @Serializable
 data class ProductData(
+    @SerialName("Id_product")
     val id: Int? = null,
+
+    @SerialName("Name")
     val nombre: String? = null,
+
+    @SerialName("Price")
     val precio: Double? = null,
+    @SerialName("Stock")
     val stock: Int? = null,
+    @SerialName("Description")
+    val descripcion: String? = null,
+    @SerialName("Img_url")
     val imagen: String? = null,
     val nombre_vendedor: String? = null,
     val numero_vendedor: String? = null,
+    @SerialName("Seller_id")
     val id_vendedor: Int? = null
-)
-
-@Serializable
-data class CreateOrderRequest(
-    val id_producto: Int,
-    val id_vendedor: Int,
-    val id_comprador: Int,
-    val cantidad: Int,
-    val numero_comprador: String
-)
-
-@Serializable
-data class OrderResponse(
-    val id: Int? = null,
-    val id_producto: Int? = null,
-    val id_vendedor: Int? = null,
-    val id_comprador: Int? = null,
-    val cantidad: Int? = null,
-    val entregado: Boolean? = null
 )
 
 interface LiveShopApi {
@@ -89,12 +86,9 @@ interface LiveShopApi {
     @POST("products")
     suspend fun createProduct(@Body request: CreateProductRequest): Response<ProductResponse>
     
-    @GET("products/all")
+    @GET("products/public")
     suspend fun getAllProducts(): Response<List<ProductData>>
-    
-    @POST("orders")
-    suspend fun createOrder(@Body request: CreateOrderRequest): Response<OrderResponse>
-    
-    @GET("orders")
-    suspend fun getAllOrders(): Response<List<OrderResponse>>
+
+    @GET("products")
+    suspend fun getAllProductsByUser(): Response<List<ProductData>>
 }

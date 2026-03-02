@@ -52,6 +52,8 @@ configurations.all {
 }
 
 dependencies {
+    implementation(libs.gson)
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
     // Core & Lifecycle
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -67,6 +69,7 @@ dependencies {
     // Navigation & Hilt
     implementation(libs.androidx.navigation.compose)
     implementation(libs.hilt.android)
+    implementation(libs.transport.api)
     ksp(libs.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
     
