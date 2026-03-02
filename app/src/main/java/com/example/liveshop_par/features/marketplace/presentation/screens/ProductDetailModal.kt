@@ -2,6 +2,7 @@ package com.example.liveshop_par.features.marketplace.presentation.screens
 
 import android.content.Intent
 import android.net.Uri
+import android.util.Base64
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,6 +24,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -37,6 +39,20 @@ import com.example.liveshop_par.domain.model.Product
 @Composable
 fun ProductDetailModal(product: Product, onDismiss: () -> Unit) {
     val context = LocalContext.current
+
+    val imageModel = remember(product.imagen) {
+        val uriString = product.imagen?.toString() ?: ""
+        if (uriString.contains("base64,")) {
+            try {
+                val base64String = uriString.substringAfter("base64,")
+                Base64.decode(base64String, Base64.DEFAULT)
+            } catch (e: Exception) {
+                product.imagen
+            }
+        } else {
+            product.imagen
+        }
+    }
 
     Dialog(
         onDismissRequest = onDismiss,
@@ -88,7 +104,7 @@ fun ProductDetailModal(product: Product, onDismiss: () -> Unit) {
                                 .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(8.dp))
                         ) {
                             AsyncImage(
-                                model = product.imagen,
+                                model = imageModel, // Pasamos el modelo decodificado
                                 contentDescription = product.nombre,
                                 modifier = Modifier.fillMaxSize(),
                                 contentScale = ContentScale.Crop

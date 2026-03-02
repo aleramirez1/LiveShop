@@ -2,6 +2,7 @@ package com.example.liveshop_par.features.marketplace.presentation.screens
 
 import android.content.Intent
 import android.net.Uri
+import android.util.Base64
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -17,6 +18,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -27,10 +29,23 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.liveshop_par.domain.model.Product
 
-
 @Composable
 fun ProductCardItem(product: Product, onClick: () -> Unit) {
     val context = LocalContext.current
+
+    val imageModel = remember(product.imagen) {
+        val uriString = product.imagen?.toString() ?: ""
+        if (uriString.contains("base64,")) {
+            try {
+                val base64String = uriString.substringAfter("base64,")
+                Base64.decode(base64String, Base64.DEFAULT)
+            } catch (e: Exception) {
+                product.imagen
+            }
+        } else {
+            product.imagen
+        }
+    }
 
     Card(
         modifier = Modifier
@@ -50,7 +65,7 @@ fun ProductCardItem(product: Product, onClick: () -> Unit) {
             ) {
                 if (product.imagen != null) {
                     AsyncImage(
-                        model = product.imagen,
+                        model = imageModel,
                         contentDescription = product.nombre,
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop
@@ -66,7 +81,7 @@ fun ProductCardItem(product: Product, onClick: () -> Unit) {
             ) {
                 Column {
                     Text(
-                        text = product.nombre,
+                        text = product.nombre.ifEmpty { "Sin nombre" },
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.SemiBold,
                         maxLines = 2,

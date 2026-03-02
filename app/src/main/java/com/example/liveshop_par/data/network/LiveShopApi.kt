@@ -56,23 +56,23 @@ data class ProductResponse(
 )
 @Serializable
 data class ProductData(
-    @SerialName("id_product")
+    @SerialName("Id_product")
     val id: Int? = null,
 
-    @SerialName("name")
+    @SerialName("Name")
     val nombre: String? = null,
 
-    @SerialName("price")
+    @SerialName("Price")
     val precio: Double? = null,
-    @SerialName("stock")
+    @SerialName("Stock")
     val stock: Int? = null,
-    @SerialName("description")
-    val descripcion: String,
-    @SerialName("img_url")
+    @SerialName("Description")
+    val descripcion: String? = null,
+    @SerialName("Img_url")
     val imagen: String? = null,
     val nombre_vendedor: String? = null,
     val numero_vendedor: String? = null,
-    @SerialName("seller_id")
+    @SerialName("Seller_id")
     val id_vendedor: Int? = null
 )
 
