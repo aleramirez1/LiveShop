@@ -9,6 +9,6 @@ class CreateOrderUseCase @Inject constructor(
     private val orderRepository: OrderRepository
 ) {
         operator fun invoke(order: Order): Flow<Result<Order>> {
-            return orderRepository.CreateOrder(order)
+            return orderRepository.createOrder(order)
         }
 }

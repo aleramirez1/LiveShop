@@ -94,13 +94,7 @@ fun ProductCardItem(product: Product, onClick: () -> Unit, onBuyClick: () -> Uni
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Button(
-                        onClick = {
-                            val intent = Intent(Intent.ACTION_SENDTO).apply {
-                                data = Uri.parse("smsto:${product.numeroVendedor}")
-                                putExtra("sms_body", "Hola, me interesa tu producto: ${product.nombre}")
-                            }
-                            context.startActivity(intent)
-                        },
+                        onClick = onBuyClick, // <--- ¡SOLO ESTO!
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(40.dp)

@@ -31,13 +31,14 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import coil.compose.AsyncImage
 import com.example.liveshop_par.domain.model.Product
 
 @Composable
-fun ProductDetailModal(product: Product, onDismiss: () -> Unit) {
+fun ProductDetailModal(product: Product, onDismiss: () -> Unit, onBuyClick: () -> Unit) {
     val context = LocalContext.current
 
     val imageModel = remember(product.imagen) {
@@ -142,20 +143,18 @@ fun ProductDetailModal(product: Product, onDismiss: () -> Unit) {
                     )
 
                     Button(
-                        onClick = {
-                            val intent = Intent(Intent.ACTION_SENDTO).apply {
-                                data = Uri.parse("smsto:${product.numeroVendedor}")
-                                putExtra("sms_body", "Hola, me interesa tu producto: ${product.nombre}")
-                            }
-                            context.startActivity(intent)
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(56.dp)
-                            .padding(top = 16.dp, bottom = 16.dp)
-                    ) {
-                        Text("Contactar al vendedor")
-                    }
+                            onClick = onBuyClick,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(40.dp)
+                        ) {
+                            Text(
+                                "Comprar",
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
+
                 }
             }
         }

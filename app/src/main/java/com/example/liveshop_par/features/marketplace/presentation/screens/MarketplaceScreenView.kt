@@ -82,7 +82,12 @@ fun MarketplaceScreenView(
     if (selectedProduct != null) {
         ProductDetailModal(
             product = selectedProduct!!,
-            onDismiss = { selectedProduct = null }
+            onDismiss = { selectedProduct = null },
+            onBuyClick = {
+                viewModel.createOrder(productId = selectedProduct!!.id, cantidad = 1)
+
+                selectedProduct = null
+            }
         )
     }
 

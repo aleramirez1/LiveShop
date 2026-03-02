@@ -81,8 +81,9 @@ data class OrderData(
 data class CreateOrderRequest(
     @SerialName("product_id")
     val productoid: Int,
+
     @SerialName("quantity")
-    val cantidad: Int,
+    val cantidad: Int
 )
 @Serializable
 data class ProductResponse(
@@ -91,7 +92,7 @@ data class ProductResponse(
 )
 @Serializable
 data class ProductData(
-    @SerialName("Id_product")
+    @SerialName("IdProduct")
     val id: Int? = null,
     @SerialName("Name")
     val nombre: String? = null,
