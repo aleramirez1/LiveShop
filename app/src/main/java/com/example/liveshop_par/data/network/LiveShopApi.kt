@@ -50,6 +50,41 @@ data class CreateProductRequest(
 )
 
 @Serializable
+data class OrderResponse(
+    @SerialName("message")
+    val message: String? = null,
+
+    @SerialName("order")
+    val order: OrderData? = null
+)
+
+@Serializable
+data class OrderData(
+    @SerialName("id_order")
+    val idOrder: Int? = null,
+    @SerialName("buyer_id")
+    val buyerId: Int? = null,
+    @SerialName("buyer_name")
+    val buyerName: String? = null,
+    @SerialName("buyer_number")
+    val buyerNumber: String? = null,
+    @SerialName("product_id")
+    val productId: Int? = null,
+    @SerialName("quantity")
+    val quantity: Int? = null,
+    @SerialName("is_delivered")
+    val isDelivered: Boolean? = null,
+    @SerialName("created_at")
+    val createdAt: String? = null
+)
+@Serializable
+data class CreateOrderRequest(
+    @SerialName("product_id")
+    val productoid: Int,
+    @SerialName("quantity")
+    val cantidad: Int,
+)
+@Serializable
 data class ProductResponse(
     val message: String? = null,
     val product: ProductData? = null
@@ -58,10 +93,8 @@ data class ProductResponse(
 data class ProductData(
     @SerialName("Id_product")
     val id: Int? = null,
-
     @SerialName("Name")
     val nombre: String? = null,
-
     @SerialName("Price")
     val precio: Double? = null,
     @SerialName("Stock")
@@ -91,4 +124,7 @@ interface LiveShopApi {
 
     @GET("products")
     suspend fun getAllProductsByUser(): Response<List<ProductData>>
+
+    @POST("orders")
+    suspend fun createOrder(@Body request: CreateOrderRequest): Response<OrderResponse>
 }

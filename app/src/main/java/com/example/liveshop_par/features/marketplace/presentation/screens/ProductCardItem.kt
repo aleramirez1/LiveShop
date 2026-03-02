@@ -30,8 +30,9 @@ import coil.compose.AsyncImage
 import com.example.liveshop_par.domain.model.Product
 
 @Composable
-fun ProductCardItem(product: Product, onClick: () -> Unit) {
+fun ProductCardItem(product: Product, onClick: () -> Unit, onBuyClick: () -> Unit) {
     val context = LocalContext.current
+
 
     val imageModel = remember(product.imagen) {
         val uriString = product.imagen?.toString() ?: ""

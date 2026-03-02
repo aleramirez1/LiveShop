@@ -1,8 +1,10 @@
 package com.example.liveshop_par.core.di
 
 import com.example.liveshop_par.data.repository.AuthRepositoryImpl
+import com.example.liveshop_par.data.repository.OrderRepositoryImpl
 import com.example.liveshop_par.data.repository.ProductRepositoryImpl
 import com.example.liveshop_par.domain.repository.AuthRepository
+import com.example.liveshop_par.domain.repository.OrderRepository
 import com.example.liveshop_par.domain.repository.ProductRepository
 import dagger.Binds
 import dagger.Module
@@ -22,4 +24,8 @@ abstract class RepositoryModule {
     @Singleton
     @Binds
     abstract fun bindProductRepository(impl: ProductRepositoryImpl): ProductRepository
+
+    @Singleton
+    @Binds
+    abstract fun bindOrderRepository(imp: OrderRepositoryImpl): OrderRepository
 }

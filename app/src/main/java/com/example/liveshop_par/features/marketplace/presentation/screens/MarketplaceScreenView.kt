@@ -181,7 +181,7 @@ fun MarketplaceScreenView(
                             }
                         }
                     }
-                } else {
+                }  else {
                     LazyVerticalGrid(
                         columns = GridCells.Fixed(2),
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -190,7 +190,10 @@ fun MarketplaceScreenView(
                         items(filteredProducts) { product ->
                             ProductCardItem(
                                 product = product,
-                                onClick = { selectedProduct = product }
+                                onClick = { selectedProduct = product },
+                                onBuyClick = {
+                                    viewModel.createOrder(productId = product.id, cantidad = 1)
+                                }
                             )
                         }
                     }

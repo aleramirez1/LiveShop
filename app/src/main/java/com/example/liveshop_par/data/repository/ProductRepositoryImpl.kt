@@ -53,7 +53,7 @@ class ProductRepositoryImpl @Inject constructor(
 
     override fun getAllProductsByUser(): Flow<Result<List<Product>>> = flow {
         try {
-            val response = apiService.getAllProductsByUser() // GET /products
+            val response = apiService.getAllProductsByUser()
             if (response.isSuccessful) {
                 emit(Result.success(mapToDomain(response.body())))
             } else {
@@ -76,7 +76,7 @@ class ProductRepositoryImpl @Inject constructor(
                     return@flow
                 }
             }
-            
+
             val request = CreateProductRequest(
                 nombre = product.nombre,
                 precio = product.precio,
@@ -86,7 +86,7 @@ class ProductRepositoryImpl @Inject constructor(
                 nombre_vendedor = product.nombreVendedor,
                 numero_vendedor = product.numeroVendedor
             )
-            
+
             val response = apiService.createProduct(request)
             if (response.isSuccessful) {
                 emit(Result.success(product))

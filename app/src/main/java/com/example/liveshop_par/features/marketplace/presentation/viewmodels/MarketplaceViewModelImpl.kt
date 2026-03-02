@@ -5,7 +5,9 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.liveshop_par.core.di.SessionManager
+import com.example.liveshop_par.domain.model.Order
 import com.example.liveshop_par.domain.model.Product
+import com.example.liveshop_par.domain.usecase.CreateOrderUseCase
 import com.example.liveshop_par.domain.usecase.GetAllProductsUseCase
 import com.example.liveshop_par.domain.usecase.CreateProductUseCase
 import com.example.liveshop_par.domain.usecase.GetAllProductByUserUseCase
@@ -29,7 +31,8 @@ class MarketplaceViewModelImpl @Inject constructor(
     val sessionManager: SessionManager,
     private val getAllProductsUseCase: GetAllProductsUseCase,
     private val getAllProductsByUserUseCase: GetAllProductByUserUseCase,
-    private val createProductUseCase: CreateProductUseCase
+    private val createProductUseCase: CreateProductUseCase,
+    private val createOrderUseCase: CreateOrderUseCase
 ) : ViewModel() {
 
     private val _marketplaceState = MutableStateFlow(MarketplaceState())
@@ -134,6 +137,45 @@ class MarketplaceViewModelImpl @Inject constructor(
                 _marketplaceState.value = _marketplaceState.value.copy(
                     isLoading = false,
                     error = e.message ?: "Error de conexion"
+                )
+            }
+        }
+    }
+
+    fun createOrder(productId: Int, cantidad: Int = 1) {
+        viewModelScope.launch {
+            _marketplaceState.value = _marketplaceState.value.copy(isLoading = true, error = null)
+
+            try {
+                val order = Order(
+                    idorder = 0,
+                    productoid = productId,
+                    cantidad = cantidad,
+                    vendedorid = 0,
+                    vendedornombre = "",
+                    vendedornumero = "",
+                    entregado = false ,
+                    creacion = ""
+                )
+
+                createOrderUseCase(order).collect { result ->
+                    result.onSuccess {
+                        _marketplaceState.value = _marketplaceState.value.copy(
+                            isLoading = false,
+                            success = true
+                        )
+                    }
+                    result.onFailure { exception ->
+                        _marketplaceState.value = _marketplaceState.value.copy(
+                            isLoading = false,
+                            error = exception.message ?: "Error al procesar la compra"
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                _marketplaceState.value = _marketplaceState.value.copy(
+                    isLoading = false,
+                    error = e.message ?: "Error de conexión"
                 )
             }
         }
