@@ -14,5 +14,7 @@
 .cxx
 local.properties
 /websocket/
+/api/
+/.kiro/
 .env
 *.exe
