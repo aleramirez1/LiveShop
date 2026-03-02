@@ -6,6 +6,8 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import okhttp3.OkHttpClient
+import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
 // regla2: modulo de hilt para provisionar instancias de red, @provides para crear instancias
@@ -18,5 +20,15 @@ object NetworkModule {
     fun provideApiClient(sessionManager: SessionManager): LiveShopApi {
         ApiClient.setSessionManager(sessionManager)
         return ApiClient.apiService
+    }
+
+    @Singleton
+    @Provides
+    fun provideOkHttpClient(): OkHttpClient {
+        return OkHttpClient.Builder()
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(15, TimeUnit.SECONDS)
+            .build()
     }
 }

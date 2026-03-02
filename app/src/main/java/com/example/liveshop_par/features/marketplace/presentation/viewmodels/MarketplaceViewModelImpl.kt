@@ -41,6 +41,9 @@ class MarketplaceViewModelImpl @Inject constructor(
     private val observeNotificationsUseCase: ObserveNotificationsUseCase
 ) : ViewModel() {
 
+    init {
+        connectToWebSocket()
+    }
     private val _marketplaceState = MutableStateFlow(MarketplaceState())
     val marketplaceState: StateFlow<MarketplaceState> = _marketplaceState
 
@@ -199,19 +202,25 @@ class MarketplaceViewModelImpl @Inject constructor(
     val notificationEvent = _notificationEvent.asSharedFlow()
 
     fun connectToWebSocket() {
-        val token = sessionManager.token.value ?: return
-
         viewModelScope.launch {
-            observeNotificationsUseCase(token).collect { jsonString ->
-                try {
+            sessionManager.token.collect { token ->
+                if (!token.isNullOrEmpty()) {
 
-                    val jsonParser = Json { ignoreUnknownKeys = true }
-                    val notification = jsonParser.decodeFromString<WsNotification>(jsonString)
-
-                    // 3. Emitimos el evento hacia la pantalla
-                    _notificationEvent.emit(notification)
-                } catch (e: Exception) {
-                    println("Error leyendo WS: ${e.message}")
+                    try {
+                        observeNotificationsUseCase(token).collect { jsonString ->
+                            try {
+                                val jsonParser = Json { ignoreUnknownKeys = true }
+                                val notification = jsonParser.decodeFromString<WsNotification>(jsonString)
+                                _notificationEvent.emit(notification)
+                            } catch (e: Exception) {
+                                println("Error decodificando JSON del WS: ${e.message}")
+                            }
+                        }
+                    } catch (e: Exception) {
+                        println("Error en la conexión del WS: ${e.message}")
+                    }
+                } else {
+                    println("Esperando token para conectar al WS...")
                 }
             }
         }

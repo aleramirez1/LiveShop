@@ -3,8 +3,11 @@ package com.example.liveshop_par.core.di
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class SessionManager {
+@Singleton
+class SessionManager @Inject constructor() {
     private val _userId = MutableStateFlow<Int?>(null)
     val userId: StateFlow<Int?> = _userId.asStateFlow()
     

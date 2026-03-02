@@ -99,6 +99,7 @@ fun MarketplaceScreenView(
                     containerColor = MaterialTheme.colorScheme.primary
                 ) {
                     Icon(Icons.Filled.Add, contentDescription = "Agregar producto")
+                    SellerNotificationOverlay()
                 }
             }
         }
