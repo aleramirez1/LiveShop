@@ -62,7 +62,9 @@ fun MarketplaceScreenView(
     var showAddProduct by remember { mutableStateOf(false) }
     val marketplaceState by viewModel.marketplaceState.collectAsState()
     var selectedProduct by remember { mutableStateOf<Product?>(null) }
+    var selectedTab by remember { mutableStateOf(0) }
     val context = LocalContext.current
+    val userId = viewModel.sessionManager.userId.value ?: 0
     
     LaunchedEffect(Unit) {
         viewModel.loadAllProducts()
@@ -74,6 +76,9 @@ fun MarketplaceScreenView(
             viewModel.resetSuccess()
         }
     }
+    
+    val myProducts = marketplaceState.products.filter { it.idVendedor == userId }
+    val allProducts = marketplaceState.products.filter { it.idVendedor != userId }
     
     if (showAddProduct) {
         AddProductModalView(
@@ -88,6 +93,8 @@ fun MarketplaceScreenView(
     if (selectedProduct != null) {
         ProductDetailModal(
             product = selectedProduct!!,
+            viewModel = viewModel,
+            isOwnProduct = selectedProduct!!.idVendedor == userId,
             onDismiss = { selectedProduct = null }
         )
     }
@@ -108,6 +115,30 @@ fun MarketplaceScreenView(
                 .padding(paddingValues)
                 .padding(16.dp)
         ) {
+            if (marketplaceState.notification != null) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(MaterialTheme.colorScheme.primary)
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = marketplaceState.notification ?: "",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
+                }
+            }
+            
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -127,6 +158,39 @@ fun MarketplaceScreenView(
                 }
             }
             
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Button(
+                    onClick = { selectedTab = 0 },
+                    modifier = Modifier.weight(1f),
+                    colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                        containerColor = if (selectedTab == 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
+                    )
+                ) {
+                    Text(
+                        "Mis Productos (${myProducts.size})",
+                        color = if (selectedTab == 0) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                
+                Button(
+                    onClick = { selectedTab = 1 },
+                    modifier = Modifier.weight(1f),
+                    colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                        containerColor = if (selectedTab == 1) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
+                    )
+                ) {
+                    Text(
+                        "Todos (${allProducts.size})",
+                        color = if (selectedTab == 1) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+            
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
@@ -137,38 +201,78 @@ fun MarketplaceScreenView(
                     .padding(bottom = 16.dp)
             )
             
-            if (marketplaceState.products.isEmpty()) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
+            if (selectedTab == 0) {
+                if (myProducts.isEmpty()) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            text = "No hay productos",
-                            style = MaterialTheme.typography.headlineSmall,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            text = "Presiona el + para agregar tu primer producto",
-                            style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.padding(top = 8.dp)
-                        )
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                text = "No tienes productos",
+                                style = MaterialTheme.typography.headlineSmall,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = "Presiona el + para agregar tu primer producto",
+                                style = MaterialTheme.typography.bodyMedium,
+                                modifier = Modifier.padding(top = 8.dp)
+                            )
+                        }
+                    }
+                } else {
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(2),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(myProducts) { product ->
+                            MyProductCardItem(
+                                product = product,
+                                onClick = { selectedProduct = product },
+                                onEdit = { },
+                                onDelete = { }
+                            )
+                        }
                     }
                 }
             } else {
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    items(marketplaceState.products) { product ->
-                        ProductCardItem(
-                            product = product,
-                            onClick = { selectedProduct = product }
-                        )
+                if (allProducts.isEmpty()) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                text = "No hay productos disponibles",
+                                style = MaterialTheme.typography.headlineSmall,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = "Vuelve más tarde",
+                                style = MaterialTheme.typography.bodyMedium,
+                                modifier = Modifier.padding(top = 8.dp)
+                            )
+                        }
+                    }
+                } else {
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(2),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(allProducts) { product ->
+                            ProductCardItem(
+                                product = product,
+                                onClick = { selectedProduct = product }
+                            )
+                        }
                     }
                 }
             }
@@ -259,7 +363,12 @@ fun ProductCardItem(product: Product, onClick: () -> Unit) {
 }
 
 @Composable
-fun ProductDetailModal(product: Product, onDismiss: () -> Unit) {
+fun ProductDetailModal(
+    product: Product,
+    viewModel: MarketplaceViewModelImpl,
+    isOwnProduct: Boolean = false,
+    onDismiss: () -> Unit
+) {
     val context = LocalContext.current
     
     Dialog(
@@ -302,7 +411,7 @@ fun ProductDetailModal(product: Product, onDismiss: () -> Unit) {
                 
                 Column(
                     modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     if (product.imagen != null) {
                         Box(
@@ -344,25 +453,193 @@ fun ProductDetailModal(product: Product, onDismiss: () -> Unit) {
                         style = MaterialTheme.typography.bodyMedium
                     )
                     
+                    if (product.categoria.isNotEmpty()) {
+                        Text(
+                            text = "Categoría: ${product.categoria}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
+                    
+                    if (product.descripcion.isNotEmpty()) {
+                        Text(
+                            text = "Descripción:",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                        Text(
+                            text = product.descripcion,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                    
+                    if (isOwnProduct) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Button(
+                                onClick = { },
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(48.dp)
+                                    .padding(top = 8.dp, bottom = 8.dp),
+                                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.secondary
+                                )
+                            ) {
+                                Text(
+                                    "Editar",
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            }
+                            
+                            Button(
+                                onClick = { },
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(48.dp)
+                                    .padding(top = 8.dp, bottom = 8.dp),
+                                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.error
+                                )
+                            ) {
+                                Text(
+                                    "Eliminar",
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            }
+                        }
+                    } else {
+                        Button(
+                            onClick = {
+                                val intent = Intent(Intent.ACTION_SENDTO).apply {
+                                    data = Uri.parse("smsto:${product.numeroVendedor}")
+                                    putExtra("sms_body", "Hola, me interesa tu producto: ${product.nombre}\nMi número: ")
+                                }
+                                context.startActivity(intent)
+                                viewModel.createOrder(
+                                    productId = product.id,
+                                    vendorId = product.idVendedor,
+                                    quantity = 1,
+                                    buyerNumber = viewModel.sessionManager.userNumber.value ?: ""
+                                )
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(48.dp)
+                                .padding(top = 8.dp, bottom = 8.dp)
+                        ) {
+                            Text(
+                                "Comprar por SMS",
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun MyProductCardItem(
+    product: Product,
+    onClick: () -> Unit,
+    onEdit: () -> Unit,
+    onDelete: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(280.dp)
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(160.dp)
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
+            ) {
+                if (product.imagen != null) {
+                    AsyncImage(
+                        model = product.imagen,
+                        contentDescription = product.nombre,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                }
+            }
+            
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(12.dp),
+                verticalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column {
                     Text(
-                        text = product.descripcion,
-                        style = MaterialTheme.typography.bodyMedium
+                        text = product.nombre,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+                
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        text = "${String.format("%.2f", product.precio)}",
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontSize = 14.sp
                     )
                     
-                    Button(
-                        onClick = {
-                            val intent = Intent(Intent.ACTION_SENDTO).apply {
-                                data = Uri.parse("smsto:${product.numeroVendedor}")
-                                putExtra("sms_body", "Hola, me interesa tu producto: ${product.nombre}")
-                            }
-                            context.startActivity(intent)
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(56.dp)
-                            .padding(top = 16.dp, bottom = 16.dp)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
-                        Text("Contactar al vendedor")
+                        Button(
+                            onClick = onEdit,
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(36.dp),
+                            colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.secondary
+                            )
+                        ) {
+                            Text(
+                                "Editar",
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
+                        
+                        Button(
+                            onClick = onDelete,
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(36.dp),
+                            colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.error
+                            )
+                        ) {
+                            Text(
+                                "Eliminar",
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
                     }
                 }
             }

@@ -6,6 +6,7 @@ import com.example.liveshop_par.data.network.LiveShopApi
 import com.example.liveshop_par.data.network.CreateProductRequest
 import com.example.liveshop_par.domain.model.Product
 import com.example.liveshop_par.domain.repository.ProductRepository
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import java.util.Base64
@@ -14,7 +15,7 @@ import javax.inject.Inject
 // regla1: implementacion de repositorio en capa de datos, inyectada con hilt
 class ProductRepositoryImpl @Inject constructor(
     private val apiService: LiveShopApi,
-    private val context: Context
+    @ApplicationContext private val context: Context
 ) : ProductRepository {
     
     override fun getAllProducts(): Flow<Result<List<Product>>> = flow {

@@ -60,6 +60,25 @@ data class ProductData(
     val id_vendedor: Int? = null
 )
 
+@Serializable
+data class CreateOrderRequest(
+    val id_producto: Int,
+    val id_vendedor: Int,
+    val id_comprador: Int,
+    val cantidad: Int,
+    val numero_comprador: String
+)
+
+@Serializable
+data class OrderResponse(
+    val id: Int? = null,
+    val id_producto: Int? = null,
+    val id_vendedor: Int? = null,
+    val id_comprador: Int? = null,
+    val cantidad: Int? = null,
+    val entregado: Boolean? = null
+)
+
 interface LiveShopApi {
     @POST("auth/login")
     suspend fun login(@Body request: LoginRequest): Response<LoginResponse>
@@ -72,4 +91,10 @@ interface LiveShopApi {
     
     @GET("products/all")
     suspend fun getAllProducts(): Response<List<ProductData>>
+    
+    @POST("orders")
+    suspend fun createOrder(@Body request: CreateOrderRequest): Response<OrderResponse>
+    
+    @GET("orders")
+    suspend fun getAllOrders(): Response<List<OrderResponse>>
 }
