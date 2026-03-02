@@ -8,11 +8,13 @@ import com.example.liveshop_par.core.di.SessionManager
 import com.example.liveshop_par.domain.model.Product
 import com.example.liveshop_par.domain.usecase.GetAllProductsUseCase
 import com.example.liveshop_par.domain.usecase.CreateProductUseCase
+import com.example.liveshop_par.domain.usecase.GetAllProductByUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
 
 data class MarketplaceState(
     val isLoading: Boolean = false,
@@ -26,6 +28,7 @@ data class MarketplaceState(
 class MarketplaceViewModelImpl @Inject constructor(
     val sessionManager: SessionManager,
     private val getAllProductsUseCase: GetAllProductsUseCase,
+    private val getAllProductsByUserUseCase: GetAllProductByUserUseCase,
     private val createProductUseCase: CreateProductUseCase
 ) : ViewModel() {
 
@@ -37,9 +40,8 @@ class MarketplaceViewModelImpl @Inject constructor(
             _marketplaceState.value = _marketplaceState.value.copy(isLoading = true, error = null)
             getAllProductsUseCase().collect { result ->
                 result.onSuccess { products ->
-                    _marketplaceState.value = MarketplaceState(
+                    _marketplaceState.value = _marketplaceState.value.copy(
                         isLoading = false,
-                        success = true,
                         products = products
                     )
                 }
@@ -47,6 +49,26 @@ class MarketplaceViewModelImpl @Inject constructor(
                     _marketplaceState.value = _marketplaceState.value.copy(
                         isLoading = false,
                         error = exception.message ?: "Error al cargar productos"
+                    )
+                }
+            }
+        }
+    }
+
+    fun loadMyProducts() {
+        viewModelScope.launch {
+            _marketplaceState.value = _marketplaceState.value.copy(isLoading = true, error = null)
+            getAllProductsByUserUseCase().collect { result ->
+                result.onSuccess { products ->
+                    _marketplaceState.value = _marketplaceState.value.copy(
+                        isLoading = false,
+                        products = products
+                    )
+                }
+                result.onFailure { exception ->
+                    _marketplaceState.value = _marketplaceState.value.copy(
+                        isLoading = false,
+                        error = exception.message ?: "Error al cargar tus productos"
                     )
                 }
             }

@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import com.example.liveshop_par.data.network.LiveShopApi
 import com.example.liveshop_par.data.network.CreateProductRequest
+import com.example.liveshop_par.data.network.ProductData
 import com.example.liveshop_par.domain.model.Product
 import com.example.liveshop_par.domain.repository.ProductRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -12,40 +13,56 @@ import kotlinx.coroutines.flow.flow
 import java.util.Base64
 import javax.inject.Inject
 
+
 // regla1: implementacion de repositorio en capa de datos, inyectada con hilt
 class ProductRepositoryImpl @Inject constructor(
     private val apiService: LiveShopApi,
     @ApplicationContext private val context: Context
 ) : ProductRepository {
-    
+
+    private fun mapToDomain(productDataList: List<ProductData>?): List<Product> {
+        return productDataList?.map { productData ->
+            Product(
+                id = productData.id ?: 0,
+                nombre = productData.nombre ?: "",
+                precio = productData.precio ?: 0.0,
+                stock = productData.stock ?: 0,
+                imagen = if (productData.imagen?.isNotEmpty() == true) {
+                    Uri.parse("data:image/jpeg;base64,${productData.imagen}")
+                } else null,
+                nombreVendedor = productData.nombre_vendedor ?: "",
+                numeroVendedor = productData.numero_vendedor ?: "",
+                idVendedor = productData.id_vendedor ?: 0,
+                descripcion = "",
+            )
+        } ?: emptyList()
+    }
+
     override fun getAllProducts(): Flow<Result<List<Product>>> = flow {
         try {
             val response = apiService.getAllProducts()
             if (response.isSuccessful) {
-                val products = response.body()?.map { productData ->
-                    Product(
-                        id = productData.id ?: 0,
-                        nombre = productData.nombre ?: "",
-                        precio = productData.precio ?: 0.0,
-                        stock = productData.stock ?: 0,
-                        imagen = if (productData.imagen?.isNotEmpty() == true) {
-                            Uri.parse("data:image/jpeg;base64,${productData.imagen}")
-                        } else null,
-                        nombreVendedor = productData.nombre_vendedor ?: "",
-                        numeroVendedor = productData.numero_vendedor ?: "",
-                        idVendedor = productData.id_vendedor ?: 0,
-                        descripcion = "",
-                    )
-                } ?: emptyList()
-                emit(Result.success(products))
+                emit(Result.success(mapToDomain(response.body())))
             } else {
-                emit(Result.failure(Exception("Error al cargar productos")))
+                emit(Result.failure(Exception("Error al cargar el catálogo")))
             }
         } catch (e: Exception) {
             emit(Result.failure(e))
         }
     }
-    
+
+    override fun getAllProductsByUser(): Flow<Result<List<Product>>> = flow {
+        try {
+            val response = apiService.getAllProductsByUser() // GET /products
+            if (response.isSuccessful) {
+                emit(Result.success(mapToDomain(response.body())))
+            } else {
+                emit(Result.failure(Exception("Error al cargar tus productos")))
+            }
+        } catch (e: Exception) {
+            emit(Result.failure(e))
+        }
+    }
     override fun createProduct(product: Product): Flow<Result<Product>> = flow {
         try {
             var imagenBase64 = ""
