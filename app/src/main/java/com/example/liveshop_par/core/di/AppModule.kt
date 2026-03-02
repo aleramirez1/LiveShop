@@ -1,5 +1,6 @@
 package com.example.liveshop_par.core.di
 
+import com.example.liveshop_par.data.network.WebSocketManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,5 +16,11 @@ object AppModule {
     @Provides
     fun provideSessionManager(): SessionManager {
         return SessionManager()
+    }
+    
+    @Singleton
+    @Provides
+    fun provideWebSocketManager(): WebSocketManager {
+        return WebSocketManager()
     }
 }

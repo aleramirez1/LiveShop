@@ -16,5 +16,7 @@ local.properties
 /.kiro/
 /api/
 /websocket/
+/api/
+/.kiro/
 .env
 *.exe
