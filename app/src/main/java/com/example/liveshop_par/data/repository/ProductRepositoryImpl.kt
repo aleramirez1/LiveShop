@@ -64,6 +64,7 @@ class ProductRepositoryImpl @Inject constructor(
                 nombre = product.nombre,
                 precio = product.precio,
                 stock = product.stock,
+                descripcion = product.descripcion,
                 imagen = imagenBase64,
                 nombre_vendedor = product.nombreVendedor,
                 numero_vendedor = product.numeroVendedor

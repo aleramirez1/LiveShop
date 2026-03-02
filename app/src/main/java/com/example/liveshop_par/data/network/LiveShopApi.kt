@@ -41,6 +41,8 @@ data class CreateProductRequest(
     val precio: Double,
     @SerialName("stock")
     val stock: Int,
+    @SerialName("description")
+    val descripcion: String,
     @SerialName("img_url")
     val imagen: String = "",
     val nombre_vendedor: String = "",
@@ -64,6 +66,8 @@ data class ProductData(
     val precio: Double? = null,
     @SerialName("stock")
     val stock: Int? = null,
+    @SerialName("description")
+    val descripcion: String,
     @SerialName("img_url")
     val imagen: String? = null,
     val nombre_vendedor: String? = null,
@@ -82,6 +86,9 @@ interface LiveShopApi {
     @POST("products")
     suspend fun createProduct(@Body request: CreateProductRequest): Response<ProductResponse>
     
-    @GET("products/all")
+    @GET("products/public")
     suspend fun getAllProducts(): Response<List<ProductData>>
+
+    @GET("products")
+    suspend fun getAllProductsByUser(): Response<List<ProductData>>
 }
