@@ -1,5 +1,6 @@
 package com.example.liveshop_par.features.marketplace.presentation.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
@@ -69,6 +71,13 @@ fun MarketplaceScreenView(
         }
     }
 
+    LaunchedEffect(marketplaceState.notificationMessage) {
+        if (marketplaceState.notificationMessage != null) {
+            kotlinx.coroutines.delay(3000)
+            viewModel.clearNotification()
+        }
+    }
+
     if (showAddProduct) {
         AddProductModalView(
             onDismiss = { showAddProduct = false },
@@ -82,7 +91,12 @@ fun MarketplaceScreenView(
     if (selectedProduct != null) {
         ProductDetailModal(
             product = selectedProduct!!,
-            onDismiss = { selectedProduct = null }
+            onDismiss = { selectedProduct = null },
+            onBuyClick = { product ->
+                viewModel.sendPurchaseNotification(product)
+                selectedProduct = null
+            },
+            isLoading = marketplaceState.isSendingNotification
         )
     }
 
@@ -119,6 +133,23 @@ fun MarketplaceScreenView(
 
                 Button(onClick = onLogout) {
                     Text("Salir")
+                }
+            }
+
+            if (marketplaceState.notificationMessage != null) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                        .background(MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(8.dp))
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = marketplaceState.notificationMessage ?: "",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
                 }
             }
 

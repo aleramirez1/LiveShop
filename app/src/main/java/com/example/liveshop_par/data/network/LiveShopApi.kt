@@ -76,6 +76,28 @@ data class ProductData(
     val id_vendedor: Int? = null
 )
 
+@Serializable
+data class PurchaseNotificationRequest(
+    @SerialName("product_id")
+    val productId: Int,
+    @SerialName("vendor_id")
+    val vendorId: Int,
+    @SerialName("buyer_id")
+    val buyerId: Int,
+    @SerialName("buyer_name")
+    val buyerName: String,
+    @SerialName("buyer_number")
+    val buyerNumber: String,
+    @SerialName("product_name")
+    val productName: String
+)
+
+@Serializable
+data class NotificationResponse(
+    val message: String? = null,
+    val success: Boolean? = null
+)
+
 interface LiveShopApi {
     @POST("auth/login")
     suspend fun login(@Body request: LoginRequest): Response<LoginResponse>
@@ -91,4 +113,7 @@ interface LiveShopApi {
 
     @GET("products")
     suspend fun getAllProductsByUser(): Response<List<ProductData>>
+
+    @POST("notifications/purchase")
+    suspend fun sendPurchaseNotification(@Body request: PurchaseNotificationRequest): Response<NotificationResponse>
 }

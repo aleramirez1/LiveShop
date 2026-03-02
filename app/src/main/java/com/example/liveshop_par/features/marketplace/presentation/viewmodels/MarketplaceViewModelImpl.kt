@@ -5,6 +5,8 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.liveshop_par.core.di.SessionManager
+import com.example.liveshop_par.data.network.LiveShopApi
+import com.example.liveshop_par.data.network.PurchaseNotificationRequest
 import com.example.liveshop_par.domain.model.Product
 import com.example.liveshop_par.domain.usecase.GetAllProductsUseCase
 import com.example.liveshop_par.domain.usecase.CreateProductUseCase
@@ -20,7 +22,9 @@ data class MarketplaceState(
     val isLoading: Boolean = false,
     val error: String? = null,
     val success: Boolean = false,
-    val products: List<Product> = emptyList()
+    val products: List<Product> = emptyList(),
+    val notificationMessage: String? = null,
+    val isSendingNotification: Boolean = false
 )
 
 // regla2: viewmodel inyectado con hilt, usa casos de uso de dominio
@@ -29,7 +33,8 @@ class MarketplaceViewModelImpl @Inject constructor(
     val sessionManager: SessionManager,
     private val getAllProductsUseCase: GetAllProductsUseCase,
     private val getAllProductsByUserUseCase: GetAllProductByUserUseCase,
-    private val createProductUseCase: CreateProductUseCase
+    private val createProductUseCase: CreateProductUseCase,
+    private val api: LiveShopApi
 ) : ViewModel() {
 
     private val _marketplaceState = MutableStateFlow(MarketplaceState())
@@ -145,5 +150,48 @@ class MarketplaceViewModelImpl @Inject constructor(
 
     fun resetSuccess() {
         _marketplaceState.value = _marketplaceState.value.copy(success = false)
+    }
+
+    fun sendPurchaseNotification(product: Product) {
+        viewModelScope.launch {
+            _marketplaceState.value = _marketplaceState.value.copy(isSendingNotification = true)
+            try {
+                val buyerId = sessionManager.userId.value ?: 0
+                val buyerName = sessionManager.userName.value ?: ""
+                val buyerNumber = sessionManager.userNumber.value ?: ""
+
+                val request = PurchaseNotificationRequest(
+                    productId = product.id,
+                    vendorId = product.idVendedor,
+                    buyerId = buyerId,
+                    buyerName = buyerName,
+                    buyerNumber = buyerNumber,
+                    productName = product.nombre
+                )
+
+                val response = api.sendPurchaseNotification(request)
+                
+                if (response.isSuccessful) {
+                    _marketplaceState.value = _marketplaceState.value.copy(
+                        isSendingNotification = false,
+                        notificationMessage = "Notificacion enviada al vendedor"
+                    )
+                } else {
+                    _marketplaceState.value = _marketplaceState.value.copy(
+                        isSendingNotification = false,
+                        error = "Error al enviar notificacion"
+                    )
+                }
+            } catch (e: Exception) {
+                _marketplaceState.value = _marketplaceState.value.copy(
+                    isSendingNotification = false,
+                    error = e.message ?: "Error de conexion"
+                )
+            }
+        }
+    }
+
+    fun clearNotification() {
+        _marketplaceState.value = _marketplaceState.value.copy(notificationMessage = null)
     }
 }
