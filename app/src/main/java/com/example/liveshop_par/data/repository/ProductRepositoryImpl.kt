@@ -27,6 +27,7 @@ class ProductRepositoryImpl @Inject constructor(
                 nombre = productData.nombre ?: "",
                 precio = productData.precio ?: 0.0,
                 stock = productData.stock ?: 0,
+                //base64: decodificar imagen base64 del servidor a data uri
                 imagen = if (productData.imagen?.isNotEmpty() == true) {
                     Uri.parse("data:image/jpeg;base64,${productData.imagen}")
                 } else null,
@@ -68,6 +69,7 @@ class ProductRepositoryImpl @Inject constructor(
             var imagenBase64 = ""
             if (product.imagen != null) {
                 try {
+                    //base64: codificar imagen a base64 para enviar al servidor
                     val inputStream = context.contentResolver.openInputStream(product.imagen)
                     val bytes = inputStream?.readBytes() ?: byteArrayOf()
                     imagenBase64 = Base64.getEncoder().encodeToString(bytes)
